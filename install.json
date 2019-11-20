@@ -5,15 +5,15 @@
       {
         "src": "./src/default.js",
         "type": "script",
-        "if": "options.customDomain"
+        "if": "!options.customDomain || options.customDomain === 'cdn.simpleanalytics.io'"
       }, {
         "src": "./src/external-events.js",
         "type": "script",
-        "if": "!options.customDomain && options.trackEvents"
+        "if": "options.customDomain && options.trackEvents"
       }, {
         "src": "./src/external.js",
         "type": "script",
-        "if": "!options.customDomain && !options.trackEvents"
+        "if": "options.customDomain && !options.trackEvents"
       }
     ]
   },
