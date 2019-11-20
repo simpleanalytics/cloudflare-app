@@ -1,53 +1,60 @@
 {
   "$schema": "http://json.schemastore.org/install",
   "resources": {
-    "body": [
+    "head": [
       {
-        "type": "style",
-        "src": "./build/styles.css"
-      },
-      {
+        "src": "./src/default.js",
         "type": "script",
-        "src": "./build/index.js"
+        "if": "options.customDomain"
+      }, {
+        "src": "./src/external-events.js",
+        "type": "script",
+        "if": "!options.customDomain && options.trackEvents"
+      }, {
+        "src": "./src/external.js",
+        "type": "script",
+        "if": "!options.customDomain && !options.trackEvents"
       }
     ]
   },
-  "dns": [
-    {
-      "type": "TXT",
-      "content": "Managed TXT Record",
-      "name": "Created by create-cloudflare-app",
-      "ttl": 120
-    }
-  ],
   "preview": {
     "handlers": [
       {
-        "options": ["_default"],
+        "options": ["*"],
         "execute": "INSTALL_SCOPE.setOptions(INSTALL_OPTIONS)"
       }
     ]
   },
   "options": {
     "properties": {
-      "location": {
-        "title": "Message Location",
-        "description": "Where should the message appear?",
-        "order": 0,
-        "type": "object",
-        "format": "element",
-        "default": {
-          "selector": "body",
-          "method": "prepend"
-        }
-      },
-      "message": {
-        "title": "Message",
-        "description": "A short example message.",
+      "customDomain": {
+        "title": "Custom domain",
         "type": "string",
-        "format": "richtext",
-        "order": 1,
-        "default": "<h1>Welcome to Cloudflare Apps!</h1><p>Download this app every time you want to make a new project.</p><p>This app renders a message to the user's website and sets a TXT DNS record with a value of 'Hello DNS'."
+        "description": "If you have a custom subdomain you can fill it in here, leave blank otherwise.",
+        "default": "cdn.simpleanalytics.io",
+        "placeholder": "cdn.simpleanalytics.io",
+        "order": 0
+      },
+      "recordDNT": {
+        "title": "Record DNT users",
+        "description": "Record page views also when DNT is enabled. DNT is to prevent tracking so we don't send events for those visits, but you can enable recording page views.",
+        "type": "boolean",
+        "default": "false",
+        "order": 1
+      },
+      "trackEvents": {
+        "title": "Track events",
+        "description": "Select this if you want to track events with Simple Analytics. Otherwise we don't include the extra code.",
+        "type": "boolean",
+        "default": "false",
+        "order": 2
+      },
+      "hashMode": {
+        "title": "Website uses hash navigation",
+        "description": "Check this box when you website uses hashtags (#) for navigation (for example carrd.co websites). If you don't know what this means, leave the box unchecked.",
+        "type": "boolean",
+        "default": "false",
+        "order": 3
       }
     }
   }
