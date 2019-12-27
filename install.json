@@ -5,57 +5,54 @@
       {
         "src": "./src/default.js",
         "type": "script",
-        "if": "!options.customDomain || options.customDomain === 'cdn.simpleanalytics.io'"
-      }, {
+        "if": "!options.custom_domain || options.custom_domain === 'cdn.simpleanalytics.io'"
+      },
+      {
         "src": "./src/external-events.js",
         "type": "script",
-        "if": "options.customDomain && options.trackEvents"
-      }, {
+        "if": "options.custom_domain && options.track_events"
+      },
+      {
         "src": "./src/external.js",
         "type": "script",
-        "if": "options.customDomain && !options.trackEvents"
-      }
-    ]
-  },
-  "preview": {
-    "handlers": [
-      {
-        "options": ["*"],
-        "execute": "INSTALL_SCOPE.setOptions(INSTALL_OPTIONS)"
+        "if": "options.custom_domain && !options.track_events"
       }
     ]
   },
   "options": {
     "properties": {
-      "customDomain": {
+      "custom_domain": {
         "title": "Custom domain",
-        "type": "string",
         "description": "If you have a custom subdomain you can fill it in here, leave blank otherwise.",
+        "type": "string",
         "default": "cdn.simpleanalytics.io",
         "placeholder": "cdn.simpleanalytics.io",
-        "order": 0
+        "order": 1
       },
-      "recordDNT": {
+      "record_dnt": {
         "title": "Record DNT users",
         "description": "Record page views also when DNT is enabled. DNT is to prevent tracking so we don't send events for those visits, but you can enable recording page views.",
         "type": "boolean",
-        "default": "false",
-        "order": 1
+        "default": false,
+        "order": 2
       },
-      "trackEvents": {
+      "track_events": {
         "title": "Track events",
         "description": "Select this if you want to track events with Simple Analytics. Otherwise we don't include the extra code.",
         "type": "boolean",
-        "default": "false",
-        "order": 2
+        "default": false,
+        "order": 3
       },
-      "hashMode": {
+      "hash_mode": {
         "title": "Website uses hash navigation",
         "description": "Check this box when you website uses hashtags (#) for navigation (for example carrd.co websites). If you don't know what this means, leave the box unchecked.",
         "type": "boolean",
-        "default": "false",
-        "order": 3
+        "default": false,
+        "order": 4
       }
     }
+  },
+  "preview": {
+    "hide": true
   }
 }
