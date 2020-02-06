@@ -26,9 +26,11 @@
       return script && script.getAttribute("data-" + attribute)
     }
 
+    // CloudFlare specific options
+    var mode = INSTALL_OPTIONS.hash_mode ? "hash" : null
+    var skipDNT = INSTALL_OPTIONS.record_dnt
+
     var script = doc.querySelector('script[src$="' + uri + '/app.js"]')
-    var mode = attr(script, "mode")
-    var skipDNT = attr(script, "skip-dnt") === "true"
     var functionName = attr(script, "sa-global") || "sa"
 
     // Don't track when host is localhost
@@ -118,7 +120,7 @@
       }
 
       var request = new XMLHttpRequest()
-      request.open("POST", uri + "/api", true)
+      request.open("POST", targetOrigin + "/api", true)
 
       // We use content type text/plain here because we don't want to send an
       // pre-flight OPTIONS request
@@ -159,4 +161,4 @@
     if (e.message) url = url + "?error=" + encodeURIComponent(e.message)
     new Image().src = url
   }
-})(window, INSTALL_OPTIONS.customDomain || "cdn.simpleanalytics.io")
+})(window, INSTALL_OPTIONS.custom_domain || "cdn.simpleanalytics.io")

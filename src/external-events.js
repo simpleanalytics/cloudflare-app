@@ -1,6 +1,8 @@
 /* eslint-env browser */
 
 ;(function(window, hostname) {
+  console.log("INSTALL_OPTIONS", INSTALL_OPTIONS)
+
   if (!window) return
   var nav = window.navigator
   var loc = window.location
@@ -221,4 +223,4 @@
     if (e.message) url = url + "?error=" + encodeURIComponent(e.message)
     new Image().src = url
   }
-})(window, INSTALL_OPTIONS.customDomain || "cdn.simpleanalytics.io")
+})(window, INSTALL_OPTIONS.custom_domain || "cdn.simpleanalytics.io")

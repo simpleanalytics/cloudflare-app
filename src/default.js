@@ -24,12 +24,9 @@
     var lastSendUrl
     var notSending = "Not sending requests "
 
-    var script = doc.querySelector('script[src="' + cdnUrl + '"]')
-    var attr = function(script, attribute) {
-      return script && script.getAttribute("data-" + attribute)
-    }
-    var mode = attr(script, "mode")
-    var skipDNT = attr(script, "skip-dnt") === "true"
+    // CloudFlare specific options
+    var mode = INSTALL_OPTIONS.hash_mode ? "hash" : null
+    var skipDNT = INSTALL_OPTIONS.record_dnt
 
     // We do advanced bot detection in our API, but this line filters already most bots
     if (userAgent.search(/(bot|spider|crawl)/gi) > -1)
