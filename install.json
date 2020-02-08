@@ -51,6 +51,6 @@
     }
   },
   "preview": {
-    "hide": false
+    "hide": true
   }
 }
