@@ -1,4 +1,8 @@
-# Simple Analytics 
+<a href="https://simpleanalytics.com/?ref=github.com/simpleanalytics/cloudflare-app">
+  <img src="https://assets.simpleanalytics.com/images/logos/logo-github-readme.png" alt="Simple Analytics logo" align="right" height="62" />
+</a>
+
+# Cloudflare App
 
 <kbd><img width="210px" alt="Screenshot" src="https://user-images.githubusercontent.com/1079135/70636186-60236c00-1c35-11ea-9636-5332621ae2db.png"></kbd>
 
