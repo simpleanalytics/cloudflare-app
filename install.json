@@ -3,17 +3,38 @@
   "resources": {
     "head": [
       {
-        "src": "./src/default.js",
+        "src": "./src/events_queue.js",
         "type": "script",
-        "if": "!options.use_custom_domain"
+        "if": "options.use_events"
+      }
+    ],
+    "body": [
+      {
+        "src": "./src/cloudflare.js",
+        "type": "script"
       },
       {
-        "src": "./src/external.js",
+        "src": "./src/automated_events.js",
         "type": "script",
-        "if": "options.use_custom_domain"
+        "if": "options.automated_events"
       }
     ]
   },
+  "preview": {
+    "hide": true
+  },
+  "dns": [
+    {
+      "type": "CNAME",
+      "content": "simpleanalyticsexternal.com",
+      "name": "simple",
+      "proxied": false,
+      "ttl": 120,
+      "data": {
+        "description": "Created by Simple Analytics CloudFlare App"
+      }
+    }
+  ],
   "options": {
     "properties": {
       "use_custom_domain": {
@@ -25,18 +46,17 @@
       },
       "custom_domain": {
         "title": "Custom domain",
-        "description": "Fill in your custom domain here (without https://)",
+        "description": "We created a CNAME record for you that points from 'simple.yourdomain.com' to 'simpleanalyticsexternal.com'. Enter the full domain including the subdomain 'simple'. After this, make sure to add 'simple.yourdomain.com' to your website settings in the Simple Analytics dashboard.",
         "type": "string",
-        "default": "cdn.simpleanalytics.io",
-        "placeholder": "cdn.simpleanalytics.io",
+        "placeholder": "simple.example.com (without https:// and trailing slashes)",
         "order": 2,
         "showIf": {
           "use_custom_domain": true
         }
       },
-      "record_dnt": {
-        "title": "Record DNT users",
-        "description": "Record page views also when DNT is enabled. DNT is to prevent tracking but we never do. So you can enable it.",
+      "collect_dnt": {
+        "title": "Collect visits of DNT users",
+        "description": "Collect visits from users who have DNT enabled. DNT is to prevent tracking but we never do. So you are allowed to collect those visits as well. By default we don't collect them.",
         "type": "boolean",
         "default": false,
         "order": 3
@@ -46,11 +66,209 @@
         "description": "Check this box when you website uses hashtags (#) for navigation (for example carrd.co websites). If you don't know what this means, leave the box unchecked.",
         "type": "boolean",
         "default": false,
-        "order": 5
+        "order": 4
+      },
+      "overwrite_hostname": {
+        "title": "Overwrite hostname",
+        "description": "Do you want to overwrite the domain name of this website?",
+        "type": "boolean",
+        "default": false,
+        "order": 7
+      },
+      "hostname": {
+        "title": "Hostname",
+        "description": "What domain do you want to use? (without www., https://, and trailing slashes)",
+        "type": "string",
+        "default": "",
+        "placeholder": "example.com",
+        "order": 8,
+        "showIf": {
+          "overwrite_hostname": true
+        }
+      },
+      "ignore_metrics_toggle": {
+        "title": "Ignore metrics",
+        "description": "Our script does only collect non-personal data. But some customers might want to limit our metrics even more. That's why we created the ignore metrics feature.",
+        "type": "boolean",
+        "default": false,
+        "order": 9
+      },
+      "ignore_metrics": {
+        "title": "Metrics to ignore",
+        "description": "Add the metric you do not want to collect in a comma separated list. For example: referrer,utm,country,session,timeonpage,scrolled,useragent,screensize,viewportsize,language",
+        "type": "string",
+        "default": "",
+        "placeholder": "referrer,utm,country,session,timeonpage,scrolled,useragent,screensize,viewportsize,language",
+        "order": 10,
+        "showIf": {
+          "ignore_metrics_toggle": true
+        }
+      },
+      "use_events": {
+        "title": "Use events",
+        "description": "If you want to add events to your code you can enble them here. We will make sure the sa_event function is available.",
+        "type": "boolean",
+        "default": false,
+        "order": 80
+      },
+      "automated_events": {
+        "title": "Add automated events",
+        "description": "You can collect a few different events automatically: outbound links, email clicks, and amount of downloads.",
+        "type": "boolean",
+        "default": false,
+        "order": 81,
+        "showIf": {
+          "use_events": true
+        }
+      },
+      "events_outbound": {
+        "title": "Collect outbound links automatically",
+        "description": "Outbound links are basically just links that go to a different website. For example you have a website with a few products listed on them. People pay you for listing those products on your website. Now you want to find a way to track the amount of visitors that go to that website. For this you’ll need outbound events!",
+        "type": "boolean",
+        "default": true,
+        "order": 82,
+        "showIf": {
+          "use_events": true,
+          "automated_events": true
+        }
+      },
+      "outbound_full_url": {
+        "title": "Use the full URL of outbound links instead of only the path as the event name.",
+        "type": "boolean",
+        "default": false,
+        "order": 83,
+        "showIf": {
+          "use_events": true,
+          "events_outbound": true,
+          "automated_events": true
+        }
+      },
+      "events_emails": {
+        "title": "Collect email clicks automatically",
+        "description": "Do you have links to email addresses on your website? Then it could make sense to see how many clicks you get on your mailto links.",
+        "type": "boolean",
+        "default": true,
+        "order": 84,
+        "showIf": {
+          "use_events": true,
+          "automated_events": true
+        }
+      },
+      "events_downloads": {
+        "title": "Collect download clicks automatically",
+        "description": "Do you have links to pdf's or other files? Collect the amount of downloads. You can specify the extensions of the files your want to collect downloads for.",
+        "type": "boolean",
+        "default": true,
+        "order": 85,
+        "showIf": {
+          "use_events": true,
+          "automated_events": true
+        }
+      },
+      "download_extensions": {
+        "title": "Sepecify which download links should be tracked",
+        "description": "Use a list of extensions separated by a comma (e.g.: pdf, csv, docx, xlsx)",
+        "type": "string",
+        "default": "pdf, csv, docx, xlsx",
+        "placeholder": "Fill in extensions separated by a comma (or leave empty for defaults)",
+        "order": 86,
+        "showIf": {
+          "use_events": true,
+          "events_downloads": true,
+          "automated_events": true
+        }
+      },
+      "downloads_full_url": {
+        "title": "Use the full URL of the download link instead of only the path as the event name",
+        "type": "boolean",
+        "default": false,
+        "order": 87,
+        "showIf": {
+          "use_events": true,
+          "events_downloads": true,
+          "automated_events": true
+        }
+      },
+      "events_use_title": {
+        "title": "Use the title of downloads and outbound links as the event name",
+        "description": "A title is what you see when you keep your cursor hovered over your link. If not available we use the URL of the link.",
+        "type": "boolean",
+        "default": true,
+        "order": 88,
+        "showIf": {
+          "use_events": true,
+          "automated_events": true
+        }
+      },
+      "advanced_settings_toggle": {
+        "title": "Advanced settings",
+        "description": "Settings that most customers don't need.",
+        "type": "boolean",
+        "default": false,
+        "order": 100
+      },
+      "allow_url_parameters": {
+        "title": "Allow extra URL parameters",
+        "description": "By default, we collect all UTM parameters (with and without the utm_ prefix) and the ref (which is short for utm_source) parameter. We don't store the rest of the query parameters. But some customers have non-personal data in their query parameters—for example, product-id or article-slug. We allow collecting those parameters as long as they are specified via this setting.",
+        "type": "string",
+        "placeholder": "product-id,article-slug",
+        "order": 101,
+        "showIf": {
+          "advanced_settings_toggle": true
+        }
+      },
+      "ignore_pages": {
+        "title": "Ignore pages",
+        "description": "Our script does only collect non-personal data. But some customers might want to limit our metrics even more. That's why we created the ignore metrics feature.",
+        "type": "string",
+        "placeholder": "/product-1,/profile*",
+        "order": 102,
+        "showIf": {
+          "advanced_settings_toggle": true
+        }
+      },
+      "non_unique_hostnames": {
+        "title": "Non unique hostnames",
+        "description": "Suppose you redirect your visitors to a payment provider, and after they complete the payment, they return to your website. Because of the nature of not tracking visitors in Simple Analytics, we count those “returning” visitors as new visitors. To prevent this from happening, you can specify the hostname of that payment provider to tell us we should register this visit as non-unique.",
+        "type": "string",
+        "placeholder": "checkout.stripe.com,checkout.paypal.com",
+        "order": 104,
+        "showIf": {
+          "advanced_settings_toggle": true
+        }
+      },
+      "strict_utm": {
+        "title": "Enable Strict UTMs",
+        "description": "When collecting UTM codes, we allow to skip the utm_ part. In our dashboard utm_source, source, ref will be stored as utm_source. But sometimes both parameters are used. To give you control over which parameter we should store you can enable strict UTMs. After that only UTM codes with the utm_ prefix will work.",
+        "type": "boolean",
+        "default": false,
+        "order": 105,
+        "showIf": {
+          "advanced_settings_toggle": true
+        }
+      },
+      "overwrite_namespace": {
+        "title": "Overwrite namespace",
+        "description": "If you don't want to use the default namespace (sa in sa_event), you can update it.",
+        "type": "boolean",
+        "default": false,
+        "order": 106,
+        "showIf": {
+          "advanced_settings_toggle": true
+        }
+      },
+      "namespace": {
+        "title": "Namespace",
+        "description": "If you don't want to use the default namespace (sa in sa_event), you can update it here.",
+        "type": "string",
+        "default": "sa",
+        "placeholder": "sa",
+        "order": 107,
+        "showIf": {
+          "advanced_settings_toggle": true,
+          "overwrite_namespace": true
+        }
       }
     }
-  },
-  "preview": {
-    "hide": true
   }
 }
