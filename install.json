@@ -106,7 +106,7 @@
       },
       "use_events": {
         "title": "Use events",
-        "description": "If you want to add events to your code you can enble them here. We will make sure the sa_event function is available.",
+        "description": "If you want to add events to your code you can enable them here. We will make sure the sa_event function is available.",
         "type": "boolean",
         "default": false,
         "order": 80
